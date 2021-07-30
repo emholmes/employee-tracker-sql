@@ -1,0 +1,28 @@
+{
+  "name": "employee-tracker-sql",
+  "version": "1.0.0",
+  "description": "12. SQL Challenge: Employee Tracker",
+  "main": "index.js",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^10.0.0",
+    "inquirer": "^8.1.2",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emholmes/employee-tracker-sql.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emholmes/employee-tracker-sql/issues"
+  },
+  "homepage": "https://github.com/emholmes/employee-tracker-sql#readme"
+}
