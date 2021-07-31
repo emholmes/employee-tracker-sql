@@ -38,6 +38,16 @@ const viewAllDepartments = () => {
   });
 }
 
+const addDepartment = (userChoice) => {
+  const sql =  `INSERT INTO departments (name) VALUES (?)`;
+  const departmentName = userChoice.newDepartment;
+  db.query(sql, departmentName, (err, result) => {
+    if (err) throw err; 
+    console.log(`Added ${departmentName} to the database`);
+    promptUser();
+  });
+}
+
 const promptUser = () => {
   return inquirer.prompt([
     {
@@ -61,6 +71,18 @@ const promptUser = () => {
         "View Total Utilized Budget of a Department",
         "Quit"
       ] 
+    },
+    {
+      type: "input",
+      name: "newDepartment",
+      message: "What is the name of the department to add?",
+      when: ({pickOption}) => {
+        if (pickOption === "Add Department") {
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
   ])
   .then(userChoice => {
@@ -77,7 +99,9 @@ const promptUser = () => {
       viewAllEmployees();
     }
     
-    
+    if (answer === "Add Department") {
+      addDepartment(userChoice);
+    }
     
   })
 }
