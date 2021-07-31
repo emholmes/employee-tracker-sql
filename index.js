@@ -27,7 +27,7 @@ const promptUser = () => {
   ])
 }
 
-async function viewAllEmployees()
+// async function viewAllEmployees()
 
 promptUser()
   .then(userPick => {
