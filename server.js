@@ -1,5 +1,6 @@
 const inquirer = require("inquirer");
 const db = require("./config/connection");
+const cTable = require('console.table');
 
 db.connect(err => {
   if (err) throw err;
@@ -7,6 +8,35 @@ db.connect(err => {
   promptUser();
 });
 
+const viewAllEmployees = () => {
+  const sql = `SELECT * FROM employees`;
+  db.query(sql, (err, result) => {
+    if (err) throw err; 
+    console.log("------------------------------------------");
+    console.table(result);
+    promptUser();
+  });
+}
+
+const viewAllRoles = () => {
+  const sql = `SELECT * FROM roles`;
+  db.query(sql, (err, result) => {
+    if (err) throw err; 
+    console.log("------------------------------------------");
+    console.table(result);
+    promptUser();
+  });
+}
+
+const viewAllDepartments = () => {
+  const sql = `SELECT * FROM departments`;
+  db.query(sql, (err, result) => {
+    if (err) throw err; 
+    console.log("------------------------------------------");
+    console.table(result);
+    promptUser();
+  });
+}
 
 const promptUser = () => {
   return inquirer.prompt([
@@ -33,11 +63,22 @@ const promptUser = () => {
       ] 
     }
   ])
-  .then(userPick => {
-    if (userPick === "View all Employees") {
+  .then(userChoice => {
+    let answer = userChoice.pickOption;
+    if (answer === "View All Departments") {
+      viewAllDepartments();
+    }
+    
+    if (answer === "View All Roles") {
+      viewAllRoles();
+    }
+
+    if (answer === "View All Employees") {
       viewAllEmployees();
     }
-    console.log(userPick);
+    
+    
+    
   })
 }
 
