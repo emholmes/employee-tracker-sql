@@ -2,10 +2,6 @@ const inquirer = require("inquirer");
 const db = require("./config/connection");
 const cTable = require('console.table');
 
-const get_employee_names = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
-
 db.connect(err => {
   if (err) throw err;
   console.log("Database connected.");
@@ -120,7 +116,9 @@ const addRole = () => {
 }
 
 const addEmployee = () => {
-  const sql_manager = get_employee_names;
+  const sql_manager = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
   db.promise().query(sql_manager) 
     .then(([rows]) => {
       // console.table(rows);
@@ -192,7 +190,9 @@ const addEmployee = () => {
 }
 
 const updateEmployeeRole = () => {
-  const sql_employees = get_employee_names;
+  const sql_employees = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
@@ -253,14 +253,18 @@ const updateEmployeeRole = () => {
 }
 
 const updateEmployeeManager = () => {
-  const sql_employees = get_employee_names;
+  const sql_employees =  `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
       rows.forEach(row => {
         employeesArray.push(row.name);
       })
-  const sql_managers = get_employee_names;
+  const sql_managers = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
   db.promise().query(sql_managers) 
     .then(([rows]) => {
       let managerArray = [];
@@ -356,7 +360,9 @@ const viewEmployeesByDepartment = () => {
 }
 
 const viewEmployeesByManager = () => {
-  const sql_manager = get_employee_names;
+  const sql_manager = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
   db.promise().query(sql_manager) 
     .then(([rows]) => {
       let managerArray = [];
@@ -397,7 +403,9 @@ const viewEmployeesByManager = () => {
 }
 
 const removeEmployee = () => {
-  const sql_employees = get_employee_names;
+  const sql_employees = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
