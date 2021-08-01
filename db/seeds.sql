@@ -1,4 +1,4 @@
-INSERT INTO employees (first_name, last_name) 
+INSERT INTO employee (first_name, last_name) 
 VALUES
   ("Ronald", "Firbank"),
   ("Virginia", "Woolf"),
@@ -7,7 +7,7 @@ VALUES
   ("Katherine", "Mansfield")
 ;
 
-INSERT INTO departments (name)
+INSERT INTO department (name)
 VALUES 
   ("Technology"),
   ("Marketing"),
@@ -15,7 +15,7 @@ VALUES
   ("Finance")
 ;
 
-INSERT INTO roles (title, salary, department_id)
+INSERT INTO role (title, salary, department_id)
 VALUES
   ("Designer", 70000, 2),
   ("Engineer", 90000, 1),

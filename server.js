@@ -9,7 +9,7 @@ db.connect(err => {
 });
 
 const viewAllEmployees = () => {
-  const sql = `SELECT * FROM employees`;
+  const sql = `SELECT * FROM employee`;
   db.query(sql, (err, result) => {
     if (err) throw err; 
     console.log("------------------------------------------");
@@ -19,7 +19,10 @@ const viewAllEmployees = () => {
 }
 
 const viewAllRoles = () => {
-  const sql = `SELECT * FROM roles`;
+  const sql = `
+    SELECT role.id, role.title AS role, role.salary, department.name AS department
+    FROM role
+    JOIN department ON role.department_id = department.id`;
   db.query(sql, (err, result) => {
     if (err) throw err; 
     console.log("------------------------------------------");
@@ -29,10 +32,13 @@ const viewAllRoles = () => {
 }
 
 const viewAllDepartments = () => {
-  const sql = `SELECT * FROM departments`;
+  const sql = `
+    SELECT department.id, department.name AS department 
+    FROM department`;
   db.query(sql, (err, result) => {
     if (err) throw err; 
-    console.log("------------------------------------------");
+    console.log(" ");
+    console.log(" ");
     console.table(result);
     promptUser();
   });
@@ -48,7 +54,7 @@ const addDepartment = () => {
   ])
   .then(departmentName => {
     console.log(departmentName);
-    const sql =  `INSERT INTO departments (name) VALUES (?)`;
+    const sql =  `INSERT INTO department (name) VALUES (?)`;
     const params = departmentName.newDepartment;
     db.query(sql, params, (err, result) => {
       if (err) throw err; 
