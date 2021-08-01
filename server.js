@@ -356,14 +356,43 @@ const viewEmployeesByDepartment = () => {
 }
 
 const viewEmployeesByManager = () => {
-  const sql = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS employee, CONCAT(manager.first_name, " ", manager.last_name) AS manager
-    FROM employee
-    LEFT JOIN employee AS manager ON employee.manager_id = manager.id`;
-  db.promise().query(sql)
+  const sql_manager = get_employee_names;
+  db.promise().query(sql_manager) 
     .then(([rows]) => {
-      console.table(rows);
-      promptUser();
+      let managerArray = [];
+      rows.forEach(row => {
+        managerArray.push(row.name);
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "managerId",
+          message: "Select a manager to view employees:",
+          choices: managerArray
+        }
+      ])
+      .then(results => {
+        const sql_manager_id = `
+          SELECT employee.id
+          FROM employee
+          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+        db.promise().query(sql_manager_id, results.managerId)
+          .then(([managers]) => {
+            results.managerId = managers[0].id;
+            const sql = `
+              SELECT CONCAT(manager.first_name, " ", manager.last_name) AS manager, CONCAT(employee.first_name, " ", employee.last_name) AS employee
+              FROM employee
+              LEFT JOIN employee AS manager ON employee.manager_id = manager.id
+              WHERE manager.id = ?`;
+            const params = [results.managerId];
+            db.query(sql, params, (err, result) => {
+              if (err) throw err;
+              console.log(" ");
+              console.table(result);
+              promptUser();
+            })
+          })
+      })
     })
 }
 
