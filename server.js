@@ -18,7 +18,6 @@ const viewAllEmployees = () => {
   db.query(sql, (err, result) => {
     if (err) throw err; 
     console.log(" ");
-    console.log(" ");
     console.table(result);
     promptUser();
   });
@@ -32,7 +31,7 @@ const viewAllRoles = () => {
     ORDER BY role.id ASC`;
   db.query(sql, (err, result) => {
     if (err) throw err; 
-    console.log("------------------------------------------");
+    console.log(" ");
     console.table(result);
     promptUser();
   });
@@ -44,7 +43,6 @@ const viewAllDepartments = () => {
     FROM department`;
   db.query(sql, (err, result) => {
     if (err) throw err; 
-    console.log(" ");
     console.log(" ");
     console.table(result);
     promptUser();
@@ -60,7 +58,6 @@ const addDepartment = () => {
     }
   ])
   .then(departmentName => {
-    console.log(departmentName);
     const sql =  `INSERT INTO department (name) VALUES (?)`;
     const params = departmentName.newDepartment;
     db.query(sql, params, (err, result) => {
@@ -493,16 +490,9 @@ const viewTotalUtilizedDeptBudget = () => {
               LEFT JOIN department ON role.department_id = department.id
               WHERE department.id = ?
               GROUP BY department.name`;
-            // `
-            //   SELECT department.name AS department, role.salary AS 'utilized budget'
-            //   FROM department
-            //   LEFT JOIN role ON department.id = role.department_id
-            //   WHERE department.id = ?
-            //   GROUP BY department.name`;
             const params = [results.departmentId];
             db.query(sql_utilized_budgets, params, (err, result) => {
               if (err) throw err;
-              console.log(" ");
               console.log(" ");
               console.table(result);
               promptUser();
