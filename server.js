@@ -2,6 +2,10 @@ const inquirer = require("inquirer");
 const db = require("./config/connection");
 const cTable = require('console.table');
 
+const sql_query_employee_names = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
+
 db.connect(err => {
   if (err) throw err;
   console.log("Database connected.");
@@ -116,9 +120,7 @@ const addRole = () => {
 }
 
 const addEmployee = () => {
-  const sql_manager = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
+  const sql_manager = sql_query_employee_names;
   db.promise().query(sql_manager) 
     .then(([rows]) => {
       // console.table(rows);
@@ -190,9 +192,7 @@ const addEmployee = () => {
 }
 
 const updateEmployeeRole = () => {
-  const sql_employees = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
+  const sql_employees = sql_query_employee_names;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
@@ -253,18 +253,14 @@ const updateEmployeeRole = () => {
 }
 
 const updateEmployeeManager = () => {
-  const sql_employees = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
+  const sql_employees = sql_query_employee_names;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
       rows.forEach(row => {
         employeesArray.push(row.name);
       })
-  const sql_managers = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
+  const sql_managers = sql_query_employee_names;
   db.promise().query(sql_managers) 
     .then(([rows]) => {
       let managerArray = [];
@@ -341,9 +337,7 @@ const viewEmployeesByManager = () => {
 }
 
 const removeEmployee = () => {
-  const sql_employees = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
+  const sql_employees = sql_query_employee_names;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
