@@ -8,6 +8,21 @@ db.connect(err => {
   promptUser();
 });
 
+const getEmployeeNames = () => {
+  const sql = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
+  return db.promise().query(sql)
+}
+
+const getEmployeeByName = (name) => {
+  const sql = `
+    SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee
+    WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+  return db.promise().query(sql, name)
+}
+
 const viewAllEmployees = () => {
   const sql = `
     SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager  
@@ -116,10 +131,7 @@ const addRole = () => {
 }
 
 const addEmployee = () => {
-  const sql_manager = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
-  db.promise().query(sql_manager) 
+    getEmployeeNames()
     .then(([rows]) => {
       // console.table(rows);
       let managerArray = [];
@@ -190,15 +202,12 @@ const addEmployee = () => {
 }
 
 const updateEmployeeRole = () => {
-  const sql_employees = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
-  db.promise().query(sql_employees)
-    .then(([rows]) => {
-      let employeesArray = [];
-      rows.forEach(row => {
-        employeesArray.push(row.name);
-      })
+  getEmployeeNames()
+  .then(([rows]) => {
+    let employeesArray = [];
+    rows.forEach(row => {
+      employeesArray.push(row.name);
+    })
   const sql_role = `
     SELECT role.title as title
     FROM role`;
@@ -223,17 +232,13 @@ const updateEmployeeRole = () => {
         }
       ])
       .then(results => {
-        const sql_employee_id = `
-          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
-          FROM employee
-          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
-        const sql_new_role_id = `
-          SELECT role.id, role.title as title
-          FROM role
-          WHERE role.title = ?`;
-          db.promise().query(sql_employee_id, results.employeeId)
-            .then(([employees]) => {
-              results.employeeId = employees[0].id;
+        getEmployeeByName(results.employeeId)
+          .then(([employees]) => {
+            results.employeeId = employees[0].id;
+          const sql_new_role_id = `
+            SELECT role.id, role.title as title
+            FROM role
+            WHERE role.title = ?`;
               db.promise().query(sql_new_role_id, results.roleId)
                 .then(([roles]) => {
                   results.roleId = roles[0].id;
@@ -252,20 +257,16 @@ const updateEmployeeRole = () => {
     })
 }
 
+
+
 const updateEmployeeManager = () => {
-  const sql_employees =  `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
-  db.promise().query(sql_employees)
+  getEmployeeNames()
     .then(([rows]) => {
       let employeesArray = [];
       rows.forEach(row => {
         employeesArray.push(row.name);
       })
-  const sql_managers = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
-  db.promise().query(sql_managers) 
+  getEmployeeNames()
     .then(([rows]) => {
       let managerArray = [];
       rows.forEach(row => {
@@ -286,18 +287,10 @@ const updateEmployeeManager = () => {
         }
       ])
       .then(results => {
-        const sql_employee_id = `
-          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
-          FROM employee
-          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
-        const sql_new_manager_id = `
-          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
-          FROM employee
-          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
-        db.promise().query(sql_employee_id, results.employeeId)
+        getEmployeeByName(results.employeeId)
           .then(([employees]) => {
             results.employeeId = employees[0].id;
-            db.promise().query(sql_new_manager_id, results.managerId)
+            getEmployeeByName(results.managerId)
               .then(([managers]) => {
                 results.managerId = managers[0].id;
                 const sql_update_employees_manager = `
@@ -360,10 +353,7 @@ const viewEmployeesByDepartment = () => {
 }
 
 const viewEmployeesByManager = () => {
-  const sql_manager = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
-  db.promise().query(sql_manager) 
+  getEmployeeNames()
     .then(([rows]) => {
       let managerArray = [];
       rows.forEach(row => {
@@ -403,10 +393,7 @@ const viewEmployeesByManager = () => {
 }
 
 const removeEmployee = () => {
-  const sql_employees = `
-    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
-    FROM employee`;
-  db.promise().query(sql_employees)
+  getEmployeeNames()
     .then(([rows]) => {
       let employeesArray = [];
       rows.forEach(row => {
@@ -421,11 +408,12 @@ const removeEmployee = () => {
         }
       ])
       .then(results => {
-        const sql_employee_id = `
-          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
-          FROM employee
-          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
-        db.promise().query(sql_employee_id, results.employeeId)
+        // const sql_employee_id = `
+        //   SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
+        //   FROM employee
+        //   WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+        // db.promise().query(sql_employee_id, results.employeeId)
+        getEmployeeByName(results.employeeId)
           .then(([employees]) => {
             results.employeeId = employees[0].id;
             const sql_delete_employee = `
