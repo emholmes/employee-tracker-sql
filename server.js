@@ -255,6 +255,69 @@ const updateEmployeeRole = () => {
     })
 }
 
+const updateEmployeeManager = () => {
+  const sql_employees = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
+  db.promise().query(sql_employees)
+    .then(([rows]) => {
+      let employeesArray = [];
+      rows.forEach(row => {
+        employeesArray.push(row.name);
+      })
+  const sql_managers = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
+  db.promise().query(sql_managers) 
+    .then(([rows]) => {
+      let managerArray = [];
+      rows.forEach(row => {
+        managerArray.push(row.name);
+      }) 
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Which employee would you like to update?",
+          choices: employeesArray
+        },
+        {
+          type: "list",
+          name: "managerId",
+          message: "Pick the selected employee's new manager:",
+          choices: managerArray
+        }
+      ])
+      .then(results => {
+        const sql_employee_id = `
+          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
+          FROM employee
+          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+        const sql_new_manager_id = `
+          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
+          FROM employee
+          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+        db.promise().query(sql_employee_id, results.employeeId)
+          .then(([employees]) => {
+            results.employeeId = employees[0].id;
+            db.promise().query(sql_new_manager_id, results.managerId)
+              .then(([managers]) => {
+                results.managerId = managers[0].id;
+                const sql_update_employees_manager = `
+                  UPDATE employee SET manager_id = ? WHERE id = ?`;
+                const params = [results.managerId, results.employeeId];
+                db.query(sql_update_employees_manager, params, (err, result) => {
+                  if (err) throw err;
+                  console.log(`Updated ${employees[0].name}'s manager to ${managers[0].name}`);
+                  promptUser();
+                })
+              })
+          })
+      })
+  })
+  })
+}
+
 const promptUser = () => {
   return inquirer.prompt([
     {
@@ -308,6 +371,10 @@ const promptUser = () => {
 
     if (answer === "Update Employee Role") {
       updateEmployeeRole();
+    }
+
+    if (answer === "Update Employee Manager") {
+      updateEmployeeManager();
     }
   })
 }
