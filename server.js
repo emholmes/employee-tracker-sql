@@ -70,7 +70,6 @@ const addDepartment = () => {
   });  
 }
 
-
 const addRole = () => {
   const sql = `
     SELECT department.name
@@ -83,12 +82,6 @@ const addRole = () => {
       })
       inquirer.prompt([
         {
-          type: "list",
-          name: "departmentId",
-          message: "What is the role's department?",
-          choices: departmentArray
-        },
-        {
           type: "input",
           name: "title",
           message: "What is the name of the role to add?"
@@ -97,6 +90,11 @@ const addRole = () => {
           type: "input",
           name: "salary",
           message: "What is the salary for this role?"
+        },{
+          type: "list",
+          name: "departmentId",
+          message: "What is the role's department?",
+          choices: departmentArray
         }
       ])
       .then(results => {
@@ -117,6 +115,10 @@ const addRole = () => {
           })
       })
     })
+}
+
+const addEmployee = () => {
+  
 }
 
 const promptUser = () => {
@@ -164,6 +166,10 @@ const promptUser = () => {
 
     if (answer === "Add Role") {
       addRole();
+    }
+
+    if (answer === "Add Employee") {
+      addEmployee();
     }
     
   })
