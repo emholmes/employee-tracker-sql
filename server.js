@@ -28,7 +28,8 @@ const viewAllRoles = () => {
   const sql = `
     SELECT role.id, role.title, role.salary, department.name AS department
     FROM role
-    JOIN department ON role.department_id = department.id`;
+    JOIN department ON role.department_id = department.id
+    ORDER BY role.id ASC`;
   db.query(sql, (err, result) => {
     if (err) throw err; 
     console.log("------------------------------------------");
