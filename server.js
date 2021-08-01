@@ -495,5 +495,14 @@ const promptUser = () => {
     if (answer === "Remove Department") {
       removeDepartment();
     }
+
+    if (answer === "Remove Role") {
+      removeRole();
+    }
+
+
+    if (answer === "Quit") {
+      return false;
+    }
   })
 }
