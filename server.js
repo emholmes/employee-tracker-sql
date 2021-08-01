@@ -343,6 +343,84 @@ const viewEmployeesByManager = () => {
     })
 }
 
+const removeEmployee = () => {
+  const sql_employees = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
+  db.promise().query(sql_employees)
+    .then(([rows]) => {
+      let employeesArray = [];
+      rows.forEach(row => {
+        employeesArray.push(row.name);
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Select the employee you want to delete:",
+          choices: employeesArray
+        }
+      ])
+      .then(results => {
+        const sql_employee_id = `
+          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
+          FROM employee
+          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+        db.promise().query(sql_employee_id, results.employeeId)
+          .then(([employees]) => {
+            results.employeeId = employees[0].id;
+            const sql_delete_employee = `
+              DELETE FROM employee WHERE id = ?`;
+            const params = [results.employeeId];
+            db.query(sql_delete_employee, params, (err, result) => {
+              if (err) throw err;
+              console.log(`Deleted ${employees[0].name} from database.`);
+              promptUser();
+            })
+          })
+    })
+  })
+}
+
+const removeDepartment = () => {
+  const sql = `
+    SELECT department.name
+    FROM department`;
+  db.promise().query(sql) 
+    .then(([rows]) => {
+      let departmentArray = [];
+      rows.forEach(row => {
+        departmentArray.push(row.name);
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "departmentId",
+          message: "Select the department you want to delete:",
+          choices: departmentArray
+        }
+      ])
+      .then(results => {
+        const sql_department_id = `
+          SELECT department.id, department.name
+          FROM department
+          WHERE department.name = ?`;
+        db.promise().query(sql_department_id, results.departmentId)
+          .then(([departments]) => {
+            results.departmentId = departments[0].id;
+            const sql_delete_department = `
+              DELETE FROM department WHERE id = ?`;
+            const params = [results.departmentId];
+            db.query(sql_delete_department, params, (err, result) => {
+              if (err) throw err;
+              console.log(`Deleted ${departments[0].name} from database.`);
+              promptUser();
+            })
+          })
+      })
+    })
+}
+
 const promptUser = () => {
   return inquirer.prompt([
     {
@@ -408,6 +486,14 @@ const promptUser = () => {
 
     if (answer === "View All Employees by Manager") {
       viewEmployeesByManager();
+    }
+
+    if (answer === "Remove Employee") {
+      removeEmployee();
+    }
+
+    if (answer === "Remove Department") {
+      removeDepartment();
     }
   })
 }
