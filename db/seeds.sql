@@ -1,12 +1,3 @@
-INSERT INTO employee (first_name, last_name) 
-VALUES
-  ("Ronald", "Firbank"),
-  ("Virginia", "Woolf"),
-  ("Piers", "Gaveston"),
-  ("Charles", "LeRoi"),
-  ("Katherine", "Mansfield")
-;
-
 INSERT INTO department (name)
 VALUES 
   ("Technology"),
@@ -21,4 +12,13 @@ VALUES
   ("Engineer", 90000, 1),
   ("Buyer", 75000, 3),
   ("Accountant", 100000, 4)
+;
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+VALUES
+  ("Ronald", "Firbank", 1, NULL),
+  ("Virginia", "Woolf", 1, NULL),
+  ("Piers", "Gaveston", 2, 2),
+  ("Charles", "LeRoi", 3, 3),
+  ("Katherine", "Mansfield", 4, 2)
 ;

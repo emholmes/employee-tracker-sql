@@ -9,7 +9,11 @@ db.connect(err => {
 });
 
 const viewAllEmployees = () => {
-  const sql = `SELECT * FROM employee`;
+  const sql = `
+    SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary 
+    FROM employee
+    JOIN role ON employee.role_id = role.id
+    JOIN department ON role.department_id = department.id`;
   db.query(sql, (err, result) => {
     if (err) throw err; 
     console.log("------------------------------------------");
@@ -20,7 +24,7 @@ const viewAllEmployees = () => {
 
 const viewAllRoles = () => {
   const sql = `
-    SELECT role.id, role.title AS role, role.salary, department.name AS department
+    SELECT role.id, role.title, role.salary, department.name AS department
     FROM role
     JOIN department ON role.department_id = department.id`;
   db.query(sql, (err, result) => {
