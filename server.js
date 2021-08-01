@@ -327,6 +327,19 @@ const viewEmployeesByDepartment = () => {
   db.promise().query(sql)
     .then(([rows]) => {
       console.table(rows);
+      promptUser();
+    })
+}
+
+const viewEmployeesByManager = () => {
+  const sql = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS employee, CONCAT(manager.first_name, " ", manager.last_name) AS manager
+    FROM employee
+    LEFT JOIN employee AS manager ON employee.manager_id = manager.id`;
+  db.promise().query(sql)
+    .then(([rows]) => {
+      console.table(rows);
+      promptUser();
     })
 }
 
@@ -391,6 +404,10 @@ const promptUser = () => {
 
     if (answer === "View All Employees by Department") {
       viewEmployeesByDepartment();
+    }
+
+    if (answer === "View All Employees by Manager") {
+      viewEmployeesByManager();
     }
   })
 }
