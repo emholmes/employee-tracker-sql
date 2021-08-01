@@ -318,6 +318,18 @@ const updateEmployeeManager = () => {
   })
 }
 
+const viewEmployeesByDepartment = () => {
+  const sql = `
+    SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS employee, department.name AS department
+    FROM employee
+    LEFT JOIN role ON employee.role_id = role.id
+    LEFT JOIN department ON role.department_id = department.id`;
+  db.promise().query(sql)
+    .then(([rows]) => {
+      console.table(rows);
+    })
+}
+
 const promptUser = () => {
   return inquirer.prompt([
     {
@@ -376,11 +388,9 @@ const promptUser = () => {
     if (answer === "Update Employee Manager") {
       updateEmployeeManager();
     }
+
+    if (answer === "View All Employees by Department") {
+      viewEmployeesByDepartment();
+    }
   })
 }
-
-// async function viewAllEmployees()
-
-
-  
-
