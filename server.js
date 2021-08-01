@@ -119,7 +119,79 @@ const addRole = () => {
 }
 
 const addEmployee = () => {
-  
+  const sql_manager = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
+  db.promise().query(sql_manager) 
+    .then(([rows]) => {
+      // console.table(rows);
+      let managerArray = [];
+      rows.forEach(row => {
+        managerArray.push(row.name);
+      })
+  const sql_role = `
+    SELECT role.title AS role
+    FROM role`;
+  db.promise().query(sql_role)
+    .then(([rows]) => {
+      let roleArray = [];
+      rows.forEach(row => {
+        roleArray.push(row.role);
+      })
+      inquirer.prompt([
+        {
+          type: "input",
+          name: "firstName",
+          message: "What is the employee's first name?"
+        },
+        {
+          type: "input",
+          name: "lastName",
+          message: "What is the employee's last name?"
+        },
+        {
+          type: "list",
+          name: "roleId",
+          message: "What is the employee's role?",
+          choices: roleArray
+        },
+        {
+          type: "list",
+          name: "managerId",
+          message: "Who is the employee's manager?",
+          choices: managerArray
+        }
+      ])
+      .then(results => {
+        const sql_manager_id = `
+          SELECT employee.id
+          FROM employee
+          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+        const sql_role_id = `
+          SELECT role.id
+          FROM role
+          WHERE role.title = ?`;
+          db.promise().query(sql_manager_id, results.managerId)
+            .then(([managers]) => {
+              results.managerId = managers[0].id;
+              db.promise().query(sql_role_id, results.roleId)
+                .then(([roles]) => {
+                  results.roleId = roles[0].id;
+                  const sql_insert_employee = `
+                  INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+                  const params = [results.firstName, results.lastName, results.managerId, results.roleId];
+                  db.query(sql_insert_employee, params, (err, result) => {
+                    if (err) throw err;
+                    console.log(`Added ${results.firstName} ${results.lastName} to the database`);
+                    promptUser();
+                  })
+                })
+            })
+          
+          
+        })  
+    })
+  })
 }
 
 const promptUser = () => {
