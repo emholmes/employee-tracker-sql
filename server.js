@@ -178,7 +178,7 @@ const addEmployee = () => {
                 .then(([roles]) => {
                   results.roleId = roles[0].id;
                   const sql_insert_employee = `
-                  INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+                    INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
                   const params = [results.firstName, results.lastName, results.managerId, results.roleId];
                   db.query(sql_insert_employee, params, (err, result) => {
                     if (err) throw err;
@@ -187,11 +187,72 @@ const addEmployee = () => {
                   })
                 })
             })
-          
-          
         })  
     })
   })
+}
+
+const updateEmployeeRole = () => {
+  const sql_employees = `
+    SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
+    FROM employee`;
+  db.promise().query(sql_employees)
+    .then(([rows]) => {
+      let employeesArray = [];
+      rows.forEach(row => {
+        employeesArray.push(row.name);
+      })
+  const sql_role = `
+    SELECT role.title as title
+    FROM role`;
+  db.promise().query(sql_role) 
+    .then(([rows]) => {
+      let roleArray = [];
+      rows.forEach(row => {
+        roleArray.push(row.title);
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Which employee would you like to update?",
+          choices: employeesArray
+        },
+        {
+          type: "list",
+          name: "roleId",
+          message: "Pick the selected employee's new role:",
+          choices: roleArray
+        }
+      ])
+      .then(results => {
+        const sql_employee_id = `
+          SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
+          FROM employee
+          WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
+        const sql_new_role_id = `
+          SELECT role.id, role.title as title
+          FROM role
+          WHERE role.title = ?`;
+          db.promise().query(sql_employee_id, results.employeeId)
+            .then(([employees]) => {
+              results.employeeId = employees[0].id;
+              db.promise().query(sql_new_role_id, results.roleId)
+                .then(([roles]) => {
+                  results.roleId = roles[0].id;
+                  const sql_update_employee_role = `
+                    UPDATE employee SET role_id = ? WHERE id = ?`;
+                  const params = [results.roleId, results.employeeId];
+                  db.query(sql_update_employee_role, params, (err, result) => {
+                    if (err) throw err; 
+                    console.log(`Updated ${employees[0].name}'s role to ${roles[0].title}`);
+                    promptUser();
+                  })
+                })
+            })  
+      })
+    })
+    })
 }
 
 const promptUser = () => {
@@ -244,7 +305,10 @@ const promptUser = () => {
     if (answer === "Add Employee") {
       addEmployee();
     }
-    
+
+    if (answer === "Update Employee Role") {
+      updateEmployeeRole();
+    }
   })
 }
 
