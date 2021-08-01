@@ -421,6 +421,45 @@ const removeDepartment = () => {
     })
 }
 
+const removeRole = () => {
+  const sql = `
+    SELECT role.title
+    FROM role`;
+  db.promise().query(sql)
+    .then(([rows]) => {
+      let roleArray = [];
+      rows.forEach(row => {
+        roleArray.push(row.title)
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "roleId",
+          message: "Select the role you want to delete:",
+          choices: roleArray
+        }
+      ])
+      .then(results => {
+        const sql_role_id = `
+          SELECT role.id, role.title
+          FROM role
+          WHERE role.title = ?`;
+        db.promise().query(sql_role_id, results.roleId)
+          .then(([roles]) => {
+            results.roleId = roles[0].id;
+            const sql_delete_role = `
+              DELETE FROM role WHERE id = ?`;
+            const params = [results.roleId];
+            db.query(sql_delete_role, params, (err, result) => {
+              if (err) throw err;
+              console.log(`Deleted ${roles[0].title} from database.`);
+              promptUser();
+            })
+          })
+      })
+    })
+}
+
 const promptUser = () => {
   return inquirer.prompt([
     {
