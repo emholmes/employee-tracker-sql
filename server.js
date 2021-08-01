@@ -2,7 +2,7 @@ const inquirer = require("inquirer");
 const db = require("./config/connection");
 const cTable = require('console.table');
 
-const sql_query_employee_names = `
+const get_employee_names = `
     SELECT CONCAT(employee.first_name, " ", employee.last_name) AS name
     FROM employee`;
 
@@ -120,7 +120,7 @@ const addRole = () => {
 }
 
 const addEmployee = () => {
-  const sql_manager = sql_query_employee_names;
+  const sql_manager = get_employee_names;
   db.promise().query(sql_manager) 
     .then(([rows]) => {
       // console.table(rows);
@@ -192,7 +192,7 @@ const addEmployee = () => {
 }
 
 const updateEmployeeRole = () => {
-  const sql_employees = sql_query_employee_names;
+  const sql_employees = get_employee_names;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
@@ -253,14 +253,14 @@ const updateEmployeeRole = () => {
 }
 
 const updateEmployeeManager = () => {
-  const sql_employees = sql_query_employee_names;
+  const sql_employees = get_employee_names;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
       rows.forEach(row => {
         employeesArray.push(row.name);
       })
-  const sql_managers = sql_query_employee_names;
+  const sql_managers = get_employee_names;
   db.promise().query(sql_managers) 
     .then(([rows]) => {
       let managerArray = [];
@@ -313,14 +313,45 @@ const updateEmployeeManager = () => {
 
 const viewEmployeesByDepartment = () => {
   const sql = `
-    SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS employee, department.name AS department
-    FROM employee
-    LEFT JOIN role ON employee.role_id = role.id
-    LEFT JOIN department ON role.department_id = department.id`;
-  db.promise().query(sql)
+    SELECT department.name
+    FROM department`;
+  db.promise().query(sql) 
     .then(([rows]) => {
-      console.table(rows);
-      promptUser();
+      let departmentArray = [];
+      rows.forEach(row => {
+        departmentArray.push(row.name);
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "departmentId",
+          message: "Select a department to view employees:",
+          choices: departmentArray
+        }
+      ])
+      .then(results => {
+        const sql_department_id = `
+          SELECT department.id, department.name
+          FROM department
+          WHERE department.name = ?`;
+        db.promise().query(sql_department_id, results.departmentId)
+          .then(([departments]) => {
+            results.departmentId = departments[0].id;
+            const sql = `
+              SELECT department.name AS department, CONCAT(employee.first_name, " ", employee.last_name) AS employee
+              FROM employee
+              LEFT JOIN role ON employee.role_id = role.id
+              LEFT JOIN department ON role.department_id = department.id
+              WHERE department.id = ?`;
+            const params = [results.departmentId];
+            db.query(sql, params, (err, result) => {
+              if (err) throw err;
+              console.log(" ");
+              console.table(result);
+              promptUser();
+            })
+          })
+      })
     })
 }
 
@@ -337,7 +368,7 @@ const viewEmployeesByManager = () => {
 }
 
 const removeEmployee = () => {
-  const sql_employees = sql_query_employee_names;
+  const sql_employees = get_employee_names;
   db.promise().query(sql_employees)
     .then(([rows]) => {
       let employeesArray = [];
