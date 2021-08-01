@@ -70,6 +70,55 @@ const addDepartment = () => {
   });  
 }
 
+
+const addRole = () => {
+  const sql = `
+    SELECT department.name
+    FROM department`;
+  db.promise().query(sql) 
+    .then(([rows]) => {
+      let departmentArray = [];
+      rows.forEach(row => {
+        departmentArray.push(row.name);
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "departmentId",
+          message: "What is the role's department?",
+          choices: departmentArray
+        },
+        {
+          type: "input",
+          name: "title",
+          message: "What is the name of the role to add?"
+        }, 
+        {
+          type: "input",
+          name: "salary",
+          message: "What is the salary for this role?"
+        }
+      ])
+      .then(results => {
+        const sql = `
+          SELECT department.id
+          FROM department
+          WHERE department.name = ?`;
+        db.promise().query(sql, results.departmentId)
+          .then(([rows]) => {
+            results.departmentId = rows[0].id;
+            const sql =  `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`;
+            const params = [results.title, results.salary, results.departmentId];
+            db.query(sql, params, (err, result) => {
+              if (err) throw err; 
+              console.log(`Added ${results.title} to the database`);
+              promptUser();
+            })
+          })
+      })
+    })
+}
+
 const promptUser = () => {
   return inquirer.prompt([
     {
@@ -111,6 +160,10 @@ const promptUser = () => {
     
     if (answer === "Add Department") {
       addDepartment();
+    }
+
+    if (answer === "Add Role") {
+      addRole();
     }
     
   })
