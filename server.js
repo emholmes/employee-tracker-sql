@@ -460,6 +460,58 @@ const removeRole = () => {
     })
 }
 
+const viewTotalUtilizedDeptBudget = () => {
+  const sql = `
+    SELECT department.name
+    FROM department`;
+  db.promise().query(sql) 
+    .then(([rows]) => {
+      let departmentArray = [];
+      rows.forEach(row => {
+        departmentArray.push(row.name);
+      })
+      inquirer.prompt([
+        {
+          type: "list",
+          name: "departmentId",
+          message: "Select a department to see the utilized budget:",
+          choices: departmentArray
+        }
+      ])
+      .then(results => {
+        const sql_department_id = `
+          SELECT department.id, department.name
+          FROM department
+          WHERE department.name = ?`;
+        db.promise().query(sql_department_id, results.departmentId)
+          .then(([departments]) => {
+            results.departmentId = departments[0].id;
+            const sql_utilized_budgets = `
+              SELECT department.name AS department, SUM(role.salary) AS 'utilized budget'
+              FROM employee
+              LEFT JOIN role ON employee.role_id = role.id
+              LEFT JOIN department ON role.department_id = department.id
+              WHERE department.id = ?
+              GROUP BY department.name`;
+            // `
+            //   SELECT department.name AS department, role.salary AS 'utilized budget'
+            //   FROM department
+            //   LEFT JOIN role ON department.id = role.department_id
+            //   WHERE department.id = ?
+            //   GROUP BY department.name`;
+            const params = [results.departmentId];
+            db.query(sql_utilized_budgets, params, (err, result) => {
+              if (err) throw err;
+              console.log(" ");
+              console.log(" ");
+              console.table(result);
+              promptUser();
+            })
+          })
+        })
+      })  
+}
+
 const promptUser = () => {
   return inquirer.prompt([
     {
@@ -539,6 +591,9 @@ const promptUser = () => {
       removeRole();
     }
 
+    if (answer === "View Total Utilized Budget of a Department") {
+      viewTotalUtilizedDeptBudget();
+    }
 
     if (answer === "Quit") {
       return false;
