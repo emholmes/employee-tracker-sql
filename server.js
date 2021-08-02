@@ -141,7 +141,6 @@ const addRole = () => {
 const addEmployee = () => {
     getEmployeeNames()
     .then(([rows]) => {
-      // console.table(rows);
       let managerArray = [];
       rows.forEach(row => {
         managerArray.push(row.name);
@@ -196,7 +195,7 @@ const addEmployee = () => {
                   results.roleId = roles[0].id;
                   const sql_insert_employee = `
                     INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
-                  const params = [results.firstName, results.lastName, results.managerId, results.roleId];
+                  const params = [results.firstName, results.lastName, results.roleId, results.managerId];
                   db.query(sql_insert_employee, params, (err, result) => {
                     if (err) throw err;
                     console.log(`Added ${results.firstName} ${results.lastName} to the database`);
