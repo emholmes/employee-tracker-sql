@@ -23,6 +23,21 @@ const getEmployeeByName = (name) => {
   return db.promise().query(sql, name)
 }
 
+const getDepartmentByName = (department) => {
+  const sql = `
+    SELECT department.id
+    FROM department
+    WHERE department.name = ?`;
+  return db.promise().query(sql, department)
+}
+
+const getDepartmentNames = () => {
+  const sql = `
+    SELECT department.name
+    FROM department`;
+  return db.promise().query(sql) 
+}
+
 const viewAllEmployees = () => {
   const sql = `
     SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager  
@@ -84,10 +99,7 @@ const addDepartment = () => {
 }
 
 const addRole = () => {
-  const sql = `
-    SELECT department.name
-    FROM department`;
-  db.promise().query(sql) 
+  getDepartmentNames()
     .then(([rows]) => {
       let departmentArray = [];
       rows.forEach(row => {
@@ -111,11 +123,7 @@ const addRole = () => {
         }
       ])
       .then(results => {
-        const sql = `
-          SELECT department.id
-          FROM department
-          WHERE department.name = ?`;
-        db.promise().query(sql, results.departmentId)
+        getDepartmentByName(results.departmentId)
           .then(([rows]) => {
             results.departmentId = rows[0].id;
             const sql =  `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`;
@@ -309,10 +317,7 @@ const updateEmployeeManager = () => {
 }
 
 const viewEmployeesByDepartment = () => {
-  const sql = `
-    SELECT department.name
-    FROM department`;
-  db.promise().query(sql) 
+  getDepartmentNames()
     .then(([rows]) => {
       let departmentArray = [];
       rows.forEach(row => {
@@ -327,11 +332,7 @@ const viewEmployeesByDepartment = () => {
         }
       ])
       .then(results => {
-        const sql_department_id = `
-          SELECT department.id, department.name
-          FROM department
-          WHERE department.name = ?`;
-        db.promise().query(sql_department_id, results.departmentId)
+        getDepartmentByName(results.departmentId)
           .then(([departments]) => {
             results.departmentId = departments[0].id;
             const sql = `
@@ -408,11 +409,6 @@ const removeEmployee = () => {
         }
       ])
       .then(results => {
-        // const sql_employee_id = `
-        //   SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS name
-        //   FROM employee
-        //   WHERE CONCAT(employee.first_name, " ", employee.last_name) = ?`;
-        // db.promise().query(sql_employee_id, results.employeeId)
         getEmployeeByName(results.employeeId)
           .then(([employees]) => {
             results.employeeId = employees[0].id;
@@ -430,10 +426,7 @@ const removeEmployee = () => {
 }
 
 const removeDepartment = () => {
-  const sql = `
-    SELECT department.name
-    FROM department`;
-  db.promise().query(sql) 
+  getDepartmentNames()
     .then(([rows]) => {
       let departmentArray = [];
       rows.forEach(row => {
@@ -448,11 +441,7 @@ const removeDepartment = () => {
         }
       ])
       .then(results => {
-        const sql_department_id = `
-          SELECT department.id, department.name
-          FROM department
-          WHERE department.name = ?`;
-        db.promise().query(sql_department_id, results.departmentId)
+        getDepartmentByName(results.departmentId)
           .then(([departments]) => {
             results.departmentId = departments[0].id;
             const sql_delete_department = `
@@ -508,10 +497,7 @@ const removeRole = () => {
 }
 
 const viewTotalUtilizedDeptBudget = () => {
-  const sql = `
-    SELECT department.name
-    FROM department`;
-  db.promise().query(sql) 
+  getDepartmentNames()
     .then(([rows]) => {
       let departmentArray = [];
       rows.forEach(row => {
@@ -526,11 +512,7 @@ const viewTotalUtilizedDeptBudget = () => {
         }
       ])
       .then(results => {
-        const sql_department_id = `
-          SELECT department.id, department.name
-          FROM department
-          WHERE department.name = ?`;
-        db.promise().query(sql_department_id, results.departmentId)
+        getDepartmentByName(results.departmentId)
           .then(([departments]) => {
             results.departmentId = departments[0].id;
             const sql_utilized_budgets = `
