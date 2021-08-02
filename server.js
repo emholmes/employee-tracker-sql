@@ -38,6 +38,13 @@ const getDepartmentNames = () => {
   return db.promise().query(sql) 
 }
 
+const getRoleTitles = () => {
+  const sql_role = `
+    SELECT role.title AS title
+    FROM role`;
+  return db.promise().query(sql_role) 
+}
+
 const viewAllEmployees = () => {
   const sql = `
     SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager  
@@ -145,14 +152,15 @@ const addEmployee = () => {
       rows.forEach(row => {
         managerArray.push(row.name);
       })
-  const sql_role = `
-    SELECT role.title AS role
-    FROM role`;
-  db.promise().query(sql_role)
+      getRoleTitles()
+  // const sql_role = `
+  //   SELECT role.title AS title
+  //   FROM role`;
+  // db.promise().query(sql_role)
     .then(([rows]) => {
       let roleArray = [];
       rows.forEach(row => {
-        roleArray.push(row.role);
+        roleArray.push(row.title);
       })
       inquirer.prompt([
         {
@@ -214,7 +222,7 @@ const updateEmployeeRole = () => {
       employeesArray.push(row.name);
     })
   const sql_role = `
-    SELECT role.title as title
+    SELECT role.title AS title
     FROM role`;
   db.promise().query(sql_role) 
     .then(([rows]) => {
