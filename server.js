@@ -179,6 +179,8 @@ const addEmployee = () => {
         }
       ])
       .then(results => {
+        let firstName = results.firstName.trim();
+        let lastName = results.lastName.trim();
         const sql_manager_id = `
           SELECT employee.id
           FROM employee
@@ -195,10 +197,10 @@ const addEmployee = () => {
                   results.roleId = roles[0].id;
                   const sql_insert_employee = `
                     INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
-                  const params = [results.firstName, results.lastName, results.roleId, results.managerId];
+                  const params = [firstName, lastName, results.roleId, results.managerId];
                   db.query(sql_insert_employee, params, (err, result) => {
                     if (err) throw err;
-                    console.log(`Added ${results.firstName} ${results.lastName} to the database`);
+                    console.log(`Added ${firstName} ${lastName} to the database`);
                     promptUser();
                   })
                 })
