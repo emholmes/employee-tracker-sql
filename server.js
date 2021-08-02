@@ -617,7 +617,7 @@ const promptUser = () => {
     }
 
     if (answer === "Quit") {
-      return false;
+      db.end();
     }
   })
 }
