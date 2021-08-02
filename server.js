@@ -45,6 +45,14 @@ const getRoleTitles = () => {
   return db.promise().query(sql_role) 
 }
 
+const getRoleId = (role) => {
+  const sql_role_id = `
+    SELECT role.id
+    FROM role
+    WHERE role.title = ?`;
+  return db.promise().query(sql_role_id, role)
+}
+
 const viewAllEmployees = () => {
   const sql = `
     SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager  
@@ -148,7 +156,7 @@ const addRole = () => {
 const addEmployee = () => {
   getEmployeeNames()
     .then(([rows]) => {
-      let managerArray = [];
+      let managerArray = ["None"];
       rows.forEach(row => {
         managerArray.push(row.name);
       })
@@ -185,19 +193,31 @@ const addEmployee = () => {
       .then(results => {
         let firstName = results.firstName.trim();
         let lastName = results.lastName.trim();
+        
         getEmployeeByName(results.managerId)
           .then(([managers]) => {
             results.managerId = managers[0].id;
-            const sql_role_id = `
-              SELECT role.id
-              FROM role
-              WHERE role.title = ?`;
-            db.promise().query(sql_role_id, results.roleId)
+            getRoleId(results.roleId)
               .then(([roles]) => {
                 results.roleId = roles[0].id;
                 const sql_insert_employee = `
                   INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
                 const params = [firstName, lastName, results.roleId, results.managerId];
+                db.query(sql_insert_employee, params, (err, result) => {
+                  if (err) throw err;
+                  console.log(`Added ${firstName} ${lastName} to the database`);
+                  promptUser();
+                })
+              })
+              
+          })
+          .catch(() => {
+            getRoleId(results.roleId)
+              .then(([roles]) => {
+                results.roleId = roles[0].id;
+                const sql_insert_employee = `
+                  INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,NULL)`;
+                const params = [firstName, lastName, results.roleId];
                 db.query(sql_insert_employee, params, (err, result) => {
                   if (err) throw err;
                   console.log(`Added ${firstName} ${lastName} to the database`);
