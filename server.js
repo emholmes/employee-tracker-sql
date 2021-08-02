@@ -152,11 +152,7 @@ const addEmployee = () => {
       rows.forEach(row => {
         managerArray.push(row.name);
       })
-      getRoleTitles()
-  // const sql_role = `
-  //   SELECT role.title AS title
-  //   FROM role`;
-  // db.promise().query(sql_role)
+  getRoleTitles()
     .then(([rows]) => {
       let roleArray = [];
       rows.forEach(row => {
@@ -221,10 +217,7 @@ const updateEmployeeRole = () => {
     rows.forEach(row => {
       employeesArray.push(row.name);
     })
-  const sql_role = `
-    SELECT role.title AS title
-    FROM role`;
-  db.promise().query(sql_role) 
+  getRoleTitles()
     .then(([rows]) => {
       let roleArray = [];
       rows.forEach(row => {
