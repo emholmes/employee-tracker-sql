@@ -20,7 +20,7 @@ To install any necessary dependencies run the following command:
 After cloning the repo to your local machine, open the package in an IDE. Make sure you have node.js and npm installed (hint: `node -v` & `npm -v`). In the package root directory, install the following packages: inquirer.js, mysql2, and console.table (`npm i inquirer mysql2 console.table`). Once all dependencies are installed, initiate the program by running `npm start` from the terminal in the root directory. The user will be prompted with a list of questions that will utilize sql queries to either create, read, update, or delete information on the database. Select "Quit" to exit the application.
 
 ## Video Walkthrough
-[Watch video walkthrough](https://drive.google.com/file/d/1N4fXnlnD3Ii7IW3Umd8IdZfcXwV5lcD_/view)
+[Watch video walkthrough](https://drive.google.com/file/d/1Xj9sHlAZg5Rh_MKTo3BCGm6_dDx13vxX/view)
 
 ## Invoking application in terminal
 ![Command-line prompts](./assets/images/command-line.png)
